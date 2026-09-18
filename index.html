@@ -54,7 +54,8 @@
 
   .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:clamp(20px,3.2vw,30px);box-shadow:var(--shadow)}
   .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  @media (max-width:760px){.grid-2{grid-template-columns:1fr}}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media (max-width:760px){.grid-2,.grid-3{grid-template-columns:1fr}}
 
   .note{border-left:4px solid var(--rose);background:#fdf5f8;border-radius:0 12px 12px 0;padding:18px 22px}
   .note.plum{border-left-color:var(--plum);background:#f6f3fa}
@@ -106,7 +107,7 @@
       <p class="eyebrow">誕生日 LINE 通知</p>
       <h1>LINEで登録して、<br>LINEで思い出す。</h1>
       <p class="lead">
-        鑑定が終わったら、LINEに<span class="mono">山田花子 1990/06/23 転職相談</span>と送るだけ。
+        鑑定が終わったら、LINEに<span class="mono">山田花子 1990/06/23 金運鑑定</span>と送るだけ。
         その方の誕生日の朝、<strong>同じトーク画面に</strong>年齢と前回のメモつきで届きます。
       </p>
       <div class="btn-row">
@@ -118,7 +119,7 @@
       <div class="phone-head">🎂 誕生日メモ</div>
       <div class="phone-body">
         <div class="me">
-          <div class="b">山田花子 1990/06/23 転職と人間関係</div>
+          <div class="b">山田花子 1990/06/23 金運鑑定</div>
           <div class="tstamp">14:32</div>
         </div>
         <div class="them">
@@ -126,7 +127,7 @@
             <div class="b-title">✅ 登録しました</div>
             お名前　　： 山田 花子<br>
             生年月日　： 1990年6月23日（35歳）<br>
-            メモ　　　： 転職と人間関係
+            メモ　　　： 金運鑑定
           </div>
           <div class="tstamp">14:32</div>
         </div>
@@ -135,7 +136,7 @@
           <div class="b">
             <div class="b-title">🎂 今日が誕生日（1名）</div>
             <div class="b-name">・山田 花子（36歳）</div>
-            <div class="b-sub">前回 2026-07-12｜転職と人間関係</div>
+            <div class="b-sub">前回 2025-07-12（11ヶ月前）｜金運鑑定</div>
           </div>
           <div class="tstamp">8:04</div>
         </div>
@@ -145,12 +146,29 @@
 
   <section>
     <div class="note plum">
-      <h3>お客様に自動でメッセージが飛ぶ仕組みではありません</h3>
-      <p style="margin-bottom:0">
-        届くのは<strong>あなただけ</strong>です。送る言葉はご自身で選びます。<br>
-        自動配信は、受け取った側に「一斉送信だな」と伝わってしまいます。それよりも、前回の相談内容を見ながら一言添えたほうが「覚えていてくれた」になります。
-        年齢と前回のメモを一緒に出しているのは、そのためです。
+      <h3>狙いは「もう一度ご相談いただくこと」</h3>
+      <p>
+        誕生日は、こちらから連絡してもいやがられない数少ないきっかけです。この仕組みは、そのきっかけを取りこぼさないためのものです。
       </p>
+      <p style="margin-bottom:0">
+        だからこそ<strong>お客様へ自動配信はしません。</strong>届くのはあなただけで、送る言葉はご自身で選びます。
+        自動配信は受け取った側に「一斉送信だな」と伝わってしまい、かえって足が遠のきます。
+      </p>
+    </div>
+
+    <div class="grid-3" style="margin-top:20px">
+      <div class="card">
+        <h3>年齢</h3>
+        <p style="color:var(--muted);font-size:14px;margin:0">「今年は節目ですね」と、鑑定につながる話をしやすくするため。</p>
+      </div>
+      <div class="card">
+        <h3>前回からの間隔</h3>
+        <p style="color:var(--muted);font-size:14px;margin:0">1年ぶりの方と先月来た方では、かける言葉が変わるため。</p>
+      </div>
+      <div class="card">
+        <h3>前回のメモ</h3>
+        <p style="color:var(--muted);font-size:14px;margin:0">「あの件どうなりました？」と、続きから入れるため。</p>
+      </div>
     </div>
   </section>
 
@@ -160,9 +178,9 @@
     <div class="tbl scroll">
       <table>
         <tr><th style="width:42%">送る言葉</th><th>何が起きるか</th></tr>
-        <tr><td class="cmd">山田花子 1990/06/23 転職相談</td><td>台帳に登録（メモは省略できます）</td></tr>
+        <tr><td class="cmd">山田花子 1990/06/23 金運鑑定</td><td>台帳に登録（メモは省略できます）</td></tr>
         <tr><td class="cmd">山田花子 6/23</td><td>生まれ年が分からないときはこれで。年齢は出しません</td></tr>
-        <tr><td class="cmd">メモ 山田花子 恋愛の相談</td><td><strong>前回の鑑定日を今日にして</strong>、メモを更新</td></tr>
+        <tr><td class="cmd">メモ 山田花子 金運鑑定。9月以降が動く時期と伝えた</td><td><strong>前回の鑑定日を今日にして</strong>、メモを更新。<br>「何を占ったか＋次に繋がる一言」を書いておくと、誕生日の連絡で効きます</td></tr>
         <tr><td class="cmd">一覧</td><td>直近10名を表示</td></tr>
         <tr><td class="cmd">今日</td><td>今日が誕生日の方をすぐ確認</td></tr>
         <tr><td class="cmd">削除 山田花子</td><td>台帳から外す（戻し方も一緒に返ってきます）</td></tr>
@@ -222,7 +240,7 @@ https://ryoya9595.github.io/tanjobi-line/
   <section>
     <h2>仕組み</h2>
     <div class="flow">スマホのLINE
-   │ 「山田花子 1990/06/23 転職相談」
+   │ 「山田花子 1990/06/23 金運鑑定」
    ↓
 Vercel（受け口）
    │ 署名を確認 → 本人か確認

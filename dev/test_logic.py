@@ -77,7 +77,7 @@ ok("生年不明はNone", db.age_on(B(None, 6, 23), date(2026, 6, 23)), None)
 
 print("\n■ CSVの読み書き")
 rows = [
-    db.Customer("山田 花子", "1990-06-23", "2026-07-12", "転職と人間関係"),
+    db.Customer("山田 花子", "1990-06-23", "2026-07-12", "金運鑑定"),
     db.Customer("佐藤,あかり", "--02-29", "", 'メモに"引用"とカンマ,あり'),
 ]
 text = db.dumps(rows)
@@ -104,11 +104,24 @@ ok("カンマ区切り", db.parse_offsets("0,3"), [0, 3])
 ok("順不同でも整列", db.parse_offsets("7, 0 ,3"), [0, 3, 7])
 ok("変な値は無視", db.parse_offsets("0,abc,999"), [0])
 
+print("\n■ 前回からの間隔（リピート判断の材料）")
+ok("今月", db.months_since("2026-06-10", date(2026, 6, 23)), "今月")
+ok("1ヶ月前", db.months_since("2026-05-10", date(2026, 6, 23)), "1ヶ月前")
+ok("4ヶ月前", db.months_since("2026-02-23", date(2026, 6, 23)), "4ヶ月前")
+ok("11ヶ月前", db.months_since("2025-07-23", date(2026, 6, 23)), "11ヶ月前")
+ok("ちょうど1年前", db.months_since("2025-06-23", date(2026, 6, 23)), "1年前")
+ok("1年2ヶ月前", db.months_since("2025-04-23", date(2026, 6, 23)), "1年2ヶ月前")
+ok("3年前", db.months_since("2023-06-23", date(2026, 6, 23)), "3年前")
+ok("日をまたぐ手前", db.months_since("2026-05-25", date(2026, 6, 23)), "今月")
+ok("空欄はNone", db.months_since("", date(2026, 6, 23)), None)
+ok("年なしはNone", db.months_since("--06-23", date(2026, 6, 23)), None)
+ok("未来の日付はNone", db.months_since("2027-01-01", date(2026, 6, 23)), None)
+
 print("\n■ 抽出と文面")
 people = [
-    db.Customer("山田 花子", "1990-06-23", "2026-07-12", "転職と人間関係"),
+    db.Customer("山田 花子", "1990-06-23", "2025-07-12", "金運鑑定。9月以降が動く時期と伝えた"),
     db.Customer("佐藤 あかり", "--06-23", "", ""),
-    db.Customer("田中 一郎", "1997-06-26", "2026-01-05", "仕事運"),
+    db.Customer("田中 一郎", "1997-06-26", "2026-01-05", "恋愛。年内に判断したいとのこと"),
     db.Customer("読めない人", "あした", "", ""),
 ]
 hits = db.find_birthdays(people, date(2026, 6, 23), [0, 3])
@@ -124,7 +137,7 @@ ok("3日後の見出し", "📅 3日後が誕生日（1名）" in text, True)
 ok("年齢つき", "・山田 花子（36歳）" in text, True)
 ok("生年不明は年齢なし", "・佐藤 あかり\n" in text or text.endswith("・佐藤 あかり"), True)
 ok("事前は「になります」", "・田中 一郎（29歳になります）" in text, True)
-ok("前回とメモ", "　前回 2026-07-12｜転職と人間関係" in text, True)
+ok("前回・間隔・メモ", "　前回 2025-07-12（11ヶ月前）｜金運鑑定。9月以降が動く時期と伝えた" in text, True)
 ok("該当0なら空", db.build_message([]), "")
 
 print("\n■ 長文の分割")

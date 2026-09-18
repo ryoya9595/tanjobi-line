@@ -2,12 +2,14 @@
 
 ■ 台帳の形
     name,birthday,last_visit,memo
-    山田花子,1990-06-23,2026-07-12,転職と人間関係。9月が動く時期と伝えた
+    山田花子,1990-06-23,2026-07-12,金運鑑定。9月以降が動く時期と伝えた
 
 - `birthday` は原則 `YYYY-MM-DD`（LINEから登録するときに正規化される）。
   ただし手で直されることを前提に、読む側は `1990/6/23` `1990年6月23日` `6/23`（年なし）
   なども受ける。読めない行は黙って飛ばす（1行の書き損じで全体を止めない）。
 - `last_visit` `memo` は任意。空でよい。
+  誕生日の連絡はリピートのきっかけなので、`memo` には「何を占ったか」と
+  「次に繋がる一言」を入れておくと効く（例: `金運鑑定。9月以降が動く時期と伝えた`）。
 
 ■ 個人情報
 このCSVには顧客の氏名と生年月日が入る。**必ず private リポジトリに置くこと。**
@@ -215,11 +217,43 @@ def save(path: str | Path, customers: list[Customer]) -> None:
 
 # ---------------------------------------------------------------- 抽出
 
+def months_since(last_visit: str, today: date) -> Optional[str]:
+    """前回の鑑定から、どれくらい空いたかを日本語で返す。読めなければ None。
+
+    誕生日の連絡はリピートのきっかけなので、「久しぶりかどうか」が
+    いちばん効く情報になる。1年以上ぶりの方と先月来た方では、
+    かける言葉が変わるため。
+    """
+    bd = parse_birthday(last_visit)
+    if bd is None or bd.year is None:
+        return None
+
+    try:
+        d = date(bd.year, bd.month, min(bd.day, 28))
+    except ValueError:
+        return None
+
+    months = (today.year - d.year) * 12 + (today.month - d.month)
+    if today.day < d.day:
+        months -= 1
+
+    if months < 0:
+        return None
+    if months == 0:
+        return "今月"
+    if months < 12:
+        return f"{months}ヶ月前"
+
+    years, rest = divmod(months, 12)
+    return f"{years}年前" if rest == 0 else f"{years}年{rest}ヶ月前"
+
+
 @dataclass
 class Hit:
     customer: Customer
     age: Optional[int]
     offset: int          # 何日後が誕生日か（0＝今日）
+    since: Optional[str] = None   # 前回の鑑定からの間隔（「1年2ヶ月前」など）
 
 
 def find_birthdays(
@@ -237,7 +271,14 @@ def find_birthdays(
                 continue
             if not is_birthday_on(bd, target):
                 continue
-            hits.append(Hit(customer=c, age=age_on(bd, target), offset=off))
+            hits.append(
+                Hit(
+                    customer=c,
+                    age=age_on(bd, target),
+                    offset=off,
+                    since=months_since(c.last_visit, today),
+                )
+            )
     return hits
 
 
@@ -281,7 +322,8 @@ def build_message(hits: list[Hit]) -> str:
 
             sub = []
             if h.customer.last_visit:
-                sub.append(f"前回 {h.customer.last_visit}")
+                span = f"（{h.since}）" if h.since else ""
+                sub.append(f"前回 {h.customer.last_visit}{span}")
             if h.customer.memo:
                 sub.append(h.customer.memo)
             if sub:

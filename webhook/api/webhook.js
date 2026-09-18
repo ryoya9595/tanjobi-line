@@ -1,7 +1,7 @@
 /**
  * LINEから顧客台帳を操作する Webhook（Vercel Serverless Function）
  *
- * 占い師がスマホのLINEに「山田花子 1990/06/23 転職相談」と送ると、
+ * 占い師がスマホのLINEに「山田花子 1990/06/23 金運鑑定」と送ると、
  * GitHub の private リポジトリにある data/customers.csv に1行足す。
  * 毎朝 GitHub Actions がそのCSVを読んで、誕生日の人をLINEに通知する。
  * ＝ 登録も通知も、同じトーク画面で完結する。
@@ -106,12 +106,14 @@ const USAGE = [
   '【使い方】',
   '',
   '▼ 登録する',
-  '　山田花子 1990/06/23 転職と人間関係',
+  '　山田花子 1990/06/23 金運鑑定',
   '　（名前・生年月日・メモ。メモは省略できます）',
   '',
   '▼ 鑑定のあとにメモを更新する',
-  '　メモ 山田花子 恋愛の相談。年内に判断したいとのこと',
+  '　メモ 山田花子 金運鑑定。9月以降が動く時期と伝えた',
   '　→ 前回の鑑定日が今日になります',
+  '　※「何を占ったか＋次に繋がる一言」を書いておくと、',
+  '　　誕生日のときに「あの件どうなりました？」と入れます',
   '',
   '▼ そのほか',
   '　一覧　　　… 直近の登録を10名まで表示',
@@ -142,7 +144,7 @@ async function handleText(raw) {
 
 // ---------------------------------------------------------------- 登録
 
-/** 「山田花子 1990/06/23 転職相談」→ { name, birthday, memo } */
+/** 「山田花子 1990/06/23 金運鑑定」→ { name, birthday, memo } */
 export function parseRegistration(text) {
   const tokens = text.split(/[\s　]+/).filter(Boolean);
   if (tokens.length < 2) return null;
@@ -155,7 +157,7 @@ export function parseRegistration(text) {
   let name;
   let memo;
   if (dateIndex === 0) {
-    // 日付が先頭「1990/06/23 山田花子 転職相談」
+    // 日付が先頭「1990/06/23 山田花子 金運鑑定」
     name = tokens[1];
     memo = tokens.slice(2).join(' ');
   } else {
@@ -175,7 +177,7 @@ async function register(text, force) {
       '生年月日が読み取れませんでした。',
       '',
       'こんな形で送ってください：',
-      '　山田花子 1990/06/23 転職と人間関係',
+      '　山田花子 1990/06/23 金運鑑定',
       '',
       '（生まれ年が分からないときは「山田花子 6/23」でもOKです）',
     ].join('\n');
@@ -247,7 +249,8 @@ async function updateMemo(rest) {
     `前回鑑定日： ${row.last_visit}`,
     `メモ　　　： ${row.memo}`,
     '',
-    '次の誕生日のときに、この内容が一緒に届きます。',
+    'この内容は、次の誕生日のお知らせに一緒に届きます。',
+    '「あの件どうなりました？」と続きから入れます。',
   ].join('\n');
 }
 
@@ -313,7 +316,7 @@ function matchByName(rows, text) {
 async function listCustomers() {
   const { rows } = await readCsv();
   if (rows.length === 0) {
-    return ['台帳はまだ空です。', '', 'こんな形で登録できます：', '　山田花子 1990/06/23 転職と人間関係'].join('\n');
+    return ['台帳はまだ空です。', '', 'こんな形で登録できます：', '　山田花子 1990/06/23 金運鑑定'].join('\n');
   }
 
   const recent = rows.slice(-10).reverse();
