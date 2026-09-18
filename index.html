@@ -110,7 +110,7 @@
         その方の誕生日の朝、<strong>同じトーク画面に</strong>年齢と前回のメモつきで届きます。
       </p>
       <div class="btn-row">
-        <a class="btn" href="#install">導入のしかたを見る</a>
+        <a class="btn" href="#install">Claude Codeに貼る文を見る</a>
         <span class="filesize">費用0円／設置1時間ほど</span>
       </div>
     </div>
@@ -175,30 +175,27 @@
   </section>
 
   <section id="install">
-    <h2>導入は、この4ステップ</h2>
-    <p class="lead" style="margin-bottom:26px">ZipとプロンプトをClaude Codeに渡すだけ。設定はClaude Codeが進めます。</p>
-    <div class="steps">
-      <div class="step">
-        <div>
-          <h3>Zipをダウンロードする</h3>
-          <p>解凍しなくてOK。そのまま使います。</p>
-          <div class="btn-row">
-            <a class="btn ghost" href="tanjobi-line-kit.zip" download>⬇ tanjobi-line-kit.zip</a>
-            <span class="filesize">約41KB</span>
-          </div>
-        </div>
+    <h2>導入は、このURLを貼るだけ</h2>
+    <p class="lead" style="margin-bottom:26px">
+      Claude Code に下の文をそのまま貼って送ってください。あとはClaude Codeが手順を読んで、最後まで案内します。
+    </p>
+
+    <div class="card" style="padding:0;overflow:hidden">
+      <pre id="startMsg" style="border-radius:0;margin:0">このページを読んで、誕生日LINE通知の導入を手伝ってください。
+https://ryoya9595.github.io/tanjobi-line/
+
+ページの「AIエージェント向けの案内」に沿って、1ステップずつ進めてください。
+わからないことは私に質問してください。パスワードは入力しないでください。</pre>
+      <div style="padding:16px 20px">
+        <button class="btn" id="copyStart" type="button">📋 この文をコピー</button>
       </div>
+    </div>
+
+    <div class="steps" style="margin-top:26px">
       <div class="step">
         <div>
-          <h3>導入プロンプトをコピーする</h3>
-          <p>Claude Codeに貼り付ける指示文です。中身を読む必要はありません。</p>
-          <div class="btn-row"><button class="btn ghost" id="copyMsg" type="button">📋 導入プロンプトをコピー</button></div>
-        </div>
-      </div>
-      <div class="step">
-        <div>
-          <h3>Zipをドラッグして、プロンプトを貼り付ける</h3>
-          <p>Claude Codeのチャットに、Zipファイルをドラッグ＆ドロップ。そのままコピーしたプロンプトを貼り付けて送信します。</p>
+          <h3>上の文を Claude Code に貼って送る</h3>
+          <p>Zipのダウンロードも解凍も、<strong>Claude Codeがやります</strong>。</p>
         </div>
       </div>
       <div class="step">
@@ -210,19 +207,15 @@
     </div>
 
     <details>
-      <summary>導入プロンプトの中身を見る</summary>
-      <pre id="sendMsg">添付した tanjobi-line-kit.zip を解凍して、中の「導入手順_ClaudeCodeに読ませる.md」を読み、その手順どおりに導入を進めてください。
-
-■ 進め方のお願い
-・各ステップの前に、これから何をするかを説明して、進めてよいか確認してください。
-・私はログインと、画面に出たトークンの貼り付けだけ担当します。
-　それ以外の画面操作と設定は、あなたが進めてください。
-
-■ 特に気をつけてほしいこと
-・トークンをチャットに書き出さないでください。貼り付けは私がやります。
-・いま使っているLINE公式アカウント（エルメ/Lステップ）には絶対に触らないでください。
-　通知用のアカウントを新しく作る方針です。
-・お客様の氏名や生年月日の一覧を、チャットに書き出さないでください。</pre>
+      <summary>自分でZipを落としたい場合</summary>
+      <p style="margin:10px 0 0;color:var(--muted);font-size:14.5px">
+        Zipを先にダウンロードして、Claude Codeのチャットにドラッグ＆ドロップしても構いません。
+        その場合は「添付したZipの中の『導入手順_ClaudeCodeに読ませる.md』を読んで進めてください」と伝えてください。
+      </p>
+      <div class="btn-row">
+        <a class="btn ghost" href="tanjobi-line-kit.zip" download>⬇ tanjobi-line-kit.zip</a>
+        <span class="filesize">約41KB</span>
+      </div>
     </details>
   </section>
 
@@ -315,6 +308,57 @@ GitHub の非公開リポジトリ
     </div>
   </section>
 
+  <section id="for-agents">
+    <h2>AIエージェント向けの案内</h2>
+    <p class="lead" style="margin-bottom:22px">
+      ここから下は、Claude Code などのAIエージェントが読む部分です。利用者の方は読み飛ばしてかまいません。
+    </p>
+
+    <div class="card">
+      <p style="font-weight:800;margin-bottom:14px">AIエージェントの方へ</p>
+      <p style="font-size:14.5px;color:var(--muted)">
+        このページを読んだあなたが主導して、利用者の導入を進めてください。手順の本体はキットの中にあります。
+      </p>
+
+      <h3 style="margin-top:22px">1. キットを取得する</h3>
+      <p style="font-size:14.5px;color:var(--muted);margin-bottom:8px">利用者のOSに合うほうを、あなたが実行してください。</p>
+      <pre style="font-size:12px"># Mac / Linux
+cd ~/Desktop && curl -sSL -o tanjobi-line-kit.zip https://ryoya9595.github.io/tanjobi-line/tanjobi-line-kit.zip && unzip -q tanjobi-line-kit.zip
+
+# Windows（PowerShell）
+Set-Location "$HOME\Desktop"; Invoke-WebRequest -Uri https://ryoya9595.github.io/tanjobi-line/tanjobi-line-kit.zip -OutFile tanjobi-line-kit.zip; Expand-Archive tanjobi-line-kit.zip -DestinationPath .</pre>
+
+      <h3 style="margin-top:22px">2. 手順書を読む</h3>
+      <p style="font-size:14.5px;color:var(--muted)">
+        解凍してできた <span class="mono">tanjobi-line/導入手順_ClaudeCodeに読ませる.md</span> を読み、
+        <strong>そこに書かれた STEP 0 〜 STEP 11 のとおりに進めてください。</strong>
+        このページではなく、そちらが手順の正本です。
+      </p>
+
+      <h3 style="margin-top:22px">3. 進めかた</h3>
+      <ul class="clean yes" style="margin-top:10px">
+        <li>各STEPの冒頭で「これから○○します。進めてよいですか？」と確認してから進む</li>
+        <li>利用者に任せるのは<strong>ログイン・トークンの貼り付け・スマホ操作</strong>だけ。画面操作と設定はあなたが行う</li>
+        <li>わからないことは推測せず、利用者に質問する</li>
+      </ul>
+
+      <h3 style="margin-top:22px">4. 守ること</h3>
+      <ul class="clean no" style="margin-top:10px">
+        <li>利用者のパスワード・2段階認証コードを入力しない</li>
+        <li>トークン・シークレット・PATをチャットに書き出さない／ファイルに保存しない／コミットしない</li>
+        <li><strong>いま使っているLINE公式アカウント（エルメ・Lステップにつないでいるもの）に触らない。</strong>トークンの「再発行」もWebhook URLの変更も、利用者の配信を止める</li>
+        <li>お客様の氏名・生年月日の一覧をチャットに出力しない（報告は件数と列構成だけ）</li>
+        <li>台帳を置くリポジトリを Public で作らない（<strong>必ず Private</strong>）</li>
+        <li>削除・再発行・課金・公開設定の変更は、押す直前に必ず利用者に確認する</li>
+      </ul>
+
+      <p style="font-size:14px;color:var(--muted);margin:22px 0 0">
+        つまずきやすいのは、①Vercel の Root Directory を <span class="mono">webhook</span> にし忘れる
+        ②通知用アカウントを自分で友だち追加し忘れる ③LINEの「応答メッセージ」がオンのまま、の3つです。
+      </p>
+    </div>
+  </section>
+
   <footer>
     <p style="margin:0">
       くわしい手順は、Zipの中の「はじめにお読みください.md」「事前準備ガイド.md」に入っています。<br>
@@ -326,7 +370,8 @@ GitHub の非公開リポジトリ
 </div>
 <script>
 (function(){
-  var btn=document.getElementById('copyMsg'), msg=document.getElementById('sendMsg');
+  function bind(btnId,preId){
+  var btn=document.getElementById(btnId), msg=document.getElementById(preId);
   if(!btn||!msg)return;
   btn.addEventListener('click',function(){
     var text=msg.textContent||msg.innerText;
@@ -334,6 +379,8 @@ GitHub の非公開リポジトリ
     var fb=function(){var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);ok();};
     if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(ok,fb);}else{fb();}
   });
+  }
+  bind('copyStart','startMsg');
 })();
 </script>
 </body>
