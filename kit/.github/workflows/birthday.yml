@@ -1,0 +1,54 @@
+name: 誕生日チェック
+
+on:
+  schedule:
+    # UTC で指定する。JST は +9時間。
+    #   23:00 UTC = 翌 08:00 JST
+    # ⚠️ GitHub Actions の schedule は混雑時に数十分ずれる（仕様）。
+    #    きっかりの時刻に届けたい場合は、外部のcron（Cloudflare Workers など）から
+    #    workflow_dispatch を叩く方式に変える。
+    - cron: '0 23 * * *'
+  workflow_dispatch:
+    inputs:
+      date:
+        description: 'この日で判定する（例 2026-06-23 / 06-23）。空なら今日'
+        required: false
+        default: ''
+      dry_run:
+        description: 'LINEに送らず、ログに出すだけにする'
+        type: boolean
+        required: false
+        default: false
+
+# 台帳を読むだけなので書き込み権限は要らない
+permissions:
+  contents: read
+
+concurrency:
+  group: birthday-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: 今日が誕生日のお客様を通知
+        env:
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_TO_USER_ID: ${{ secrets.LINE_TO_USER_ID }}
+          NOTIFY_DAYS_BEFORE: ${{ vars.NOTIFY_DAYS_BEFORE || '0' }}
+        run: |
+          ARGS=""
+          if [ -n "${{ inputs.date }}" ]; then ARGS="$ARGS --date ${{ inputs.date }}"; fi
+          if [ "${{ inputs.dry_run }}" = "true" ]; then ARGS="$ARGS --dry-run"; fi
+          python3 scripts/birthday_check.py $ARGS

@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>誕生日LINE通知｜LINEで登録して、LINEで思い出す</title>
+<meta name="description" content="鑑定のあとLINEに「山田花子 1990/06/23」と送るだけ。その方の誕生日の朝、同じトーク画面に年齢と前回のメモつきで届きます。費用0円。">
+<style>
+  :root{
+    --ground:#f9f7f4; --panel:#ffffff; --panel-2:#f3f0f6;
+    --ink:#241d2b; --muted:#6f6879; --line:#e7e2ec;
+    --plum:#6b4f8f; --plum-soft:#8b6fb0; --gold:#a8792a; --rose:#b4617f;
+    --line-green:#8de055;
+    --shadow:0 1px 2px rgba(40,25,60,.05),0 8px 30px rgba(40,25,60,.07);
+    --radius:16px;
+    --sans:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;
+    color-scheme:light;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground)}
+  .wrap{
+    font-family:var(--sans); color:var(--ink); background:var(--ground);
+    -webkit-font-smoothing:antialiased; line-height:1.75;
+    padding:clamp(20px,5vw,64px) clamp(16px,5vw,32px);
+  }
+  .page{max-width:980px;margin:0 auto}
+  .eyebrow{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-weight:800;margin:0 0 14px}
+  h1{font-size:clamp(34px,6vw,58px);line-height:1.08;letter-spacing:-.02em;margin:0 0 18px;font-weight:900;text-wrap:balance}
+  h2{font-size:clamp(22px,3.4vw,30px);line-height:1.25;margin:0 0 18px;font-weight:800;letter-spacing:-.01em}
+  h3{font-size:16px;margin:0 0 8px;font-weight:800}
+  p{margin:0 0 14px}
+  .lead{font-size:clamp(16px,2.3vw,19px);color:var(--muted);max-width:34em;margin:0}
+  section{margin:clamp(44px,7vw,76px) 0}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92em;background:var(--panel-2);padding:2px 6px;border-radius:5px}
+
+  .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(24px,4vw,48px);align-items:center}
+  @media (max-width:760px){.hero{grid-template-columns:1fr}}
+
+  /* LINE風トーク */
+  .phone{background:linear-gradient(170deg,#7c8fa8,#5d6f88);border-radius:26px;padding:12px;box-shadow:var(--shadow);max-width:340px;width:100%;margin:0 auto}
+  .phone-head{color:#fff;font-size:12px;font-weight:700;padding:4px 8px 10px;opacity:.95}
+  .phone-body{background:#8fa1b8;border-radius:16px;padding:14px 12px 18px;display:grid;gap:14px}
+  .me{justify-self:end;max-width:82%}
+  .me .b{background:var(--line-green);border-radius:16px 4px 16px 16px;padding:10px 13px;font-size:13px;line-height:1.6;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+  .them{justify-self:start;max-width:88%}
+  .them .b{background:#fff;border-radius:4px 16px 16px 16px;padding:12px 14px;font-size:13px;line-height:1.65;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+  .b-title{font-weight:800;margin-bottom:9px}
+  .b-name{font-weight:700}
+  .b-sub{color:#6f6879;font-size:11.5px;margin:1px 0 9px;padding-left:1em}
+  .b-sub:last-child{margin-bottom:0}
+  .tstamp{font-size:10.5px;color:rgba(255,255,255,.8);margin-top:3px;text-align:right}
+  .them .tstamp{text-align:left}
+  .daybar{justify-self:center;background:rgba(0,0,0,.18);color:#fff;font-size:10.5px;padding:2px 12px;border-radius:999px}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:clamp(20px,3.2vw,30px);box-shadow:var(--shadow)}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:760px){.grid-2{grid-template-columns:1fr}}
+
+  .note{border-left:4px solid var(--rose);background:#fdf5f8;border-radius:0 12px 12px 0;padding:18px 22px}
+  .note.plum{border-left-color:var(--plum);background:#f6f3fa}
+  .note h3{color:var(--rose)}
+  .note.plum h3{color:var(--plum)}
+
+  .steps{counter-reset:s;display:grid;gap:14px}
+  .step{display:grid;grid-template-columns:44px 1fr;gap:16px;align-items:start;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow)}
+  .step::before{counter-increment:s;content:counter(s);width:36px;height:36px;border-radius:50%;background:var(--plum);color:#fff;display:grid;place-items:center;font-weight:800;font-size:15px}
+  .step p{margin:0;color:var(--muted);font-size:14.5px}
+  .step strong{color:var(--ink)}
+
+  .btn{display:inline-flex;align-items:center;gap:8px;background:var(--plum);color:#fff;text-decoration:none;padding:12px 20px;border-radius:999px;font-weight:800;font-size:14.5px;border:0;cursor:pointer;box-shadow:0 2px 10px rgba(107,79,143,.28);transition:transform .12s ease,box-shadow .12s ease}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(107,79,143,.34)}
+  .btn.ghost{background:var(--panel);color:var(--plum);border:1.5px solid var(--plum);box-shadow:none}
+  .btn-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:10px}
+  .filesize{font-size:12.5px;color:var(--muted)}
+
+  pre{background:#2a2333;color:#efeaf5;border-radius:12px;padding:18px 20px;overflow-x:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:1.75;margin:0;white-space:pre-wrap;word-break:break-word}
+  details{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin-top:14px}
+  summary{cursor:pointer;font-weight:700;font-size:14.5px}
+  details[open] summary{margin-bottom:12px}
+
+  .tbl{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+  .scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:14.5px}
+  th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--panel-2);font-weight:800;font-size:13.5px}
+  tr:last-child td{border-bottom:0}
+  td.cmd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;white-space:nowrap}
+
+  ul.clean{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+  ul.clean li{padding-left:28px;position:relative;font-size:14.5px}
+  ul.clean li::before{position:absolute;left:0;top:0;font-weight:800}
+  ul.yes li::before{content:"✓";color:var(--plum)}
+  ul.no li::before{content:"✕";color:var(--muted)}
+
+  .flow{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:1.9;color:var(--muted);overflow-x:auto;white-space:pre}
+
+  footer{border-top:1px solid var(--line);margin-top:clamp(48px,8vw,90px);padding-top:26px;color:var(--muted);font-size:13.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="page">
+
+  <div class="hero">
+    <div>
+      <p class="eyebrow">誕生日 LINE 通知</p>
+      <h1>LINEで登録して、<br>LINEで思い出す。</h1>
+      <p class="lead">
+        鑑定が終わったら、LINEに<span class="mono">山田花子 1990/06/23 転職相談</span>と送るだけ。
+        その方の誕生日の朝、<strong>同じトーク画面に</strong>年齢と前回のメモつきで届きます。
+      </p>
+      <div class="btn-row">
+        <a class="btn" href="#install">導入のしかたを見る</a>
+        <span class="filesize">費用0円／設置1時間ほど</span>
+      </div>
+    </div>
+    <div class="phone">
+      <div class="phone-head">🎂 誕生日メモ</div>
+      <div class="phone-body">
+        <div class="me">
+          <div class="b">山田花子 1990/06/23 転職と人間関係</div>
+          <div class="tstamp">14:32</div>
+        </div>
+        <div class="them">
+          <div class="b">
+            <div class="b-title">✅ 登録しました</div>
+            お名前　　： 山田 花子<br>
+            生年月日　： 1990年6月23日（35歳）<br>
+            メモ　　　： 転職と人間関係
+          </div>
+          <div class="tstamp">14:32</div>
+        </div>
+        <div class="daybar">6月23日</div>
+        <div class="them">
+          <div class="b">
+            <div class="b-title">🎂 今日が誕生日（1名）</div>
+            <div class="b-name">・山田 花子（36歳）</div>
+            <div class="b-sub">前回 2026-07-12｜転職と人間関係</div>
+          </div>
+          <div class="tstamp">8:04</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section>
+    <div class="note plum">
+      <h3>お客様に自動でメッセージが飛ぶ仕組みではありません</h3>
+      <p style="margin-bottom:0">
+        届くのは<strong>あなただけ</strong>です。送る言葉はご自身で選びます。<br>
+        自動配信は、受け取った側に「一斉送信だな」と伝わってしまいます。それよりも、前回の相談内容を見ながら一言添えたほうが「覚えていてくれた」になります。
+        年齢と前回のメモを一緒に出しているのは、そのためです。
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <h2>LINEに送る言葉は、これだけ</h2>
+    <p class="lead" style="margin-bottom:24px">返信には毎回ボタンが付くので、覚える必要はありません。</p>
+    <div class="tbl scroll">
+      <table>
+        <tr><th style="width:42%">送る言葉</th><th>何が起きるか</th></tr>
+        <tr><td class="cmd">山田花子 1990/06/23 転職相談</td><td>台帳に登録（メモは省略できます）</td></tr>
+        <tr><td class="cmd">山田花子 6/23</td><td>生まれ年が分からないときはこれで。年齢は出しません</td></tr>
+        <tr><td class="cmd">メモ 山田花子 恋愛の相談</td><td><strong>前回の鑑定日を今日にして</strong>、メモを更新</td></tr>
+        <tr><td class="cmd">一覧</td><td>直近10名を表示</td></tr>
+        <tr><td class="cmd">今日</td><td>今日が誕生日の方をすぐ確認</td></tr>
+        <tr><td class="cmd">削除 山田花子</td><td>台帳から外す（戻し方も一緒に返ってきます）</td></tr>
+        <tr><td class="cmd">使い方</td><td>この一覧が出ます</td></tr>
+      </table>
+    </div>
+    <p style="margin-top:18px;color:var(--muted);font-size:14.5px">
+      ココナラなどで鑑定した直後、スマホからそのまま放り込めます。<strong style="color:var(--ink)">パソコンを開く必要はありません。</strong>
+    </p>
+  </section>
+
+  <section id="install">
+    <h2>導入は、この4ステップ</h2>
+    <p class="lead" style="margin-bottom:26px">ZipとプロンプトをClaude Codeに渡すだけ。設定はClaude Codeが進めます。</p>
+    <div class="steps">
+      <div class="step">
+        <div>
+          <h3>Zipをダウンロードする</h3>
+          <p>解凍しなくてOK。そのまま使います。</p>
+          <div class="btn-row">
+            <a class="btn ghost" href="tanjobi-line-kit.zip" download>⬇ tanjobi-line-kit.zip</a>
+            <span class="filesize">約41KB</span>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <h3>導入プロンプトをコピーする</h3>
+          <p>Claude Codeに貼り付ける指示文です。中身を読む必要はありません。</p>
+          <div class="btn-row"><button class="btn ghost" id="copyMsg" type="button">📋 導入プロンプトをコピー</button></div>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <h3>Zipをドラッグして、プロンプトを貼り付ける</h3>
+          <p>Claude Codeのチャットに、Zipファイルをドラッグ＆ドロップ。そのままコピーしたプロンプトを貼り付けて送信します。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <h3>ログインとトークンの貼り付けだけ担当する</h3>
+          <p>GitHub・LINE・Vercelの画面はClaude Codeが進めます。所要時間は<strong>1時間〜1時間半</strong>。いちばん時間がかかるのはLINEの設定です。</p>
+        </div>
+      </div>
+    </div>
+
+    <details>
+      <summary>導入プロンプトの中身を見る</summary>
+      <pre id="sendMsg">添付した tanjobi-line-kit.zip を解凍して、中の「導入手順_ClaudeCodeに読ませる.md」を読み、その手順どおりに導入を進めてください。
+
+■ 進め方のお願い
+・各ステップの前に、これから何をするかを説明して、進めてよいか確認してください。
+・私はログインと、画面に出たトークンの貼り付けだけ担当します。
+　それ以外の画面操作と設定は、あなたが進めてください。
+
+■ 特に気をつけてほしいこと
+・トークンをチャットに書き出さないでください。貼り付けは私がやります。
+・いま使っているLINE公式アカウント（エルメ/Lステップ）には絶対に触らないでください。
+　通知用のアカウントを新しく作る方針です。
+・お客様の氏名や生年月日の一覧を、チャットに書き出さないでください。</pre>
+    </details>
+  </section>
+
+  <section>
+    <h2>仕組み</h2>
+    <div class="flow">スマホのLINE
+   │ 「山田花子 1990/06/23 転職相談」
+   ↓
+Vercel（受け口）
+   │ 署名を確認 → 本人か確認
+   ↓
+GitHub の非公開リポジトリ
+   │ 台帳に1行追記
+   │
+   ↑ 毎朝 GitHub Actions が読む
+   ↓ 今日が誕生日の方を探す
+スマホのLINE に通知</div>
+    <p style="margin-top:18px;color:var(--muted);font-size:14.5px">
+      お客様の情報は、<strong style="color:var(--ink)">ご自身のGitHub非公開リポジトリと、ご自身のLINEの中だけ</strong>にあります。
+      メッセージの中身をAIに読ませることもしません（コマンドの判定と記録にしか使いません）。
+    </p>
+  </section>
+
+  <section>
+    <h2>用意するもの</h2>
+    <p class="lead" style="margin-bottom:22px">費用は0円です。すべて無料枠で足ります。</p>
+    <div class="tbl scroll">
+      <table>
+        <tr><th style="width:30%">必要なもの</th><th>何に使うか</th></tr>
+        <tr><td>LINE公式アカウント</td><td><strong>通知用に新しく作ります</strong>。いま配信に使っているものには触りません</td></tr>
+        <tr><td>GitHubアカウント</td><td>台帳を置く非公開リポジトリ／毎朝の通知を動かす</td></tr>
+        <tr><td>Vercelアカウント</td><td>LINEからのメッセージを受け取る場所（GitHubアカウントでログインできます）</td></tr>
+        <tr><td>Claude Code</td><td>導入のときに使います</td></tr>
+      </table>
+    </div>
+    <p style="margin-top:18px;color:var(--muted);font-size:14.5px">
+      LINEの無料枠は月200通ですが、この仕組みで送るのは<strong style="color:var(--ink)">1日に最大1通</strong>です。
+    </p>
+  </section>
+
+  <section>
+    <div class="note">
+      <h3>いま使っているLINE公式アカウントは触りません</h3>
+      <p>エルメやLステップで配信している公式アカウントがある場合、<strong>そちらの設定は開きません。通知用に新しいアカウントを1つ作ります。</strong></p>
+      <p>理由は2つあります。</p>
+      <p style="margin-bottom:0">
+        ① 既存アカウントの<strong>トークンを作り直すと、配信ツール側が止まる</strong>ことがある<br>
+        ② <strong>Webhookは1アカウントに1つ</strong>しか設定できず、上書きすると配信ツールの受信が壊れる<br><br>
+        作業中に「<span class="mono">再発行</span>」というボタンが見えたら、それは別のアカウントを開いている合図です。押さずに止まってください。
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <h2>やること・やらないこと</h2>
+    <div class="grid-2">
+      <div class="card">
+        <ul class="clean yes">
+          <li>LINEから登録・更新・削除ができる</li>
+          <li>毎朝きまった時刻に、その日が誕生日の方を探す</li>
+          <li>年齢・前回の鑑定日・メモを添えて<strong>自分のLINE</strong>に送る</li>
+          <li>該当する方がいなければ、何も送らない</li>
+          <li>うるう年生まれは、平年は2月28日に知らせる</li>
+        </ul>
+      </div>
+      <div class="card">
+        <ul class="clean no">
+          <li>お客様へメッセージを自動で送る</li>
+          <li>いま使っている配信ツールの設定を変える</li>
+          <li>メッセージの中身をAIに読ませる</li>
+          <li>あなた以外からのメッセージに反応する</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>よくある質問</h2>
+    <div class="tbl scroll">
+      <table>
+        <tr><th style="width:38%">質問</th><th>答え</th></tr>
+        <tr><td>お客様が何人まで入れられますか</td><td>数千人でも大丈夫です。同じ日に重なっても、まとめて1通で届きます</td></tr>
+        <tr><td>2月29日生まれの方は</td><td>うるう年でない年は<strong>2月28日</strong>にお知らせします（自動）</td></tr>
+        <tr><td>生年が分からないお客様がいます</td><td><span class="mono">山田花子 6/23</span> で登録できます。その場合は年齢を出しません</td></tr>
+        <tr><td>まとめて登録したい</td><td>既存のCSVやスプレッドシートがあれば、導入のときにClaude Codeが台帳の形に変換します</td></tr>
+        <tr><td>通知の時刻は変えられますか</td><td>変えられます。ただし混雑時は数十分ずれます（GitHubの仕様）</td></tr>
+        <tr><td>他の人が私のLINEを見つけて送ってきたら</td><td>あなた以外からのメッセージは黙って無視します。返事もしません</td></tr>
+        <tr><td>やめたくなったら</td><td>通知を止めるのはボタン1つ。アカウントごと消すこともできます</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <p style="margin:0">
+      くわしい手順は、Zipの中の「はじめにお読みください.md」「事前準備ガイド.md」に入っています。<br>
+      人に渡すときは、このページのURLを送るだけでOKです。
+    </p>
+  </footer>
+
+</div>
+</div>
+<script>
+(function(){
+  var btn=document.getElementById('copyMsg'), msg=document.getElementById('sendMsg');
+  if(!btn||!msg)return;
+  btn.addEventListener('click',function(){
+    var text=msg.textContent||msg.innerText;
+    var ok=function(){var o=btn.innerHTML;btn.textContent='✓ コピーしました';setTimeout(function(){btn.innerHTML=o;},1700);};
+    var fb=function(){var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);ok();};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(ok,fb);}else{fb();}
+  });
+})();
+</script>
+</body>
+</html>

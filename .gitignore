@@ -1,0 +1,9 @@
+node_modules/
+.vercel/
+.env
+.env.local
+__pycache__/
+.DS_Store
+
+# 最初に作ったGAS版。ローカルには残すが配布物には含めない
+_archive_gas版/

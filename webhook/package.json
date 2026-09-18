@@ -1,0 +1,10 @@
+{
+  "name": "tanjobi-line-webhook",
+  "version": "1.0.0",
+  "description": "LINEから顧客台帳（GitHubのCSV）を操作するWebhook",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  }
+}
